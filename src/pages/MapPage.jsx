@@ -9,6 +9,7 @@ import VenueMarker from "../components/map/VenueMarker";
 import PlayerAvatar from "../components/map/PlayerAvatar";
 import { USER } from "../data/mockData";
 import { USER_AVATAR } from "../images/avatars";
+import { IcMenu, IcCrosshair, IcBolt, IcCompass } from "../components/ui/Icons";
 
 const MapPage = ({onVenue,onMenu}) => {
   const { isDesktop } = useBreakpoint();
@@ -101,10 +102,10 @@ const MapPage = ({onVenue,onMenu}) => {
 
       {/* ── HUD Top ── */}
       <div style={{position:"absolute",top:isDesktop?16:48,left:16,right:16,zIndex:50,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-        <button onClick={onMenu} style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:14,width:46,height:46,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:$.t1,boxShadow:"0 2px 12px rgba(0,0,0,0.3)"}}>☰</button>
+        <button onClick={onMenu} style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:14,width:46,height:46,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:$.t1,boxShadow:"0 2px 12px rgba(0,0,0,0.3)"}}><IcMenu s={20} c={$.t1}/></button>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <div style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:14,padding:"9px 16px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:6,color:$.t1,boxShadow:"0 2px 12px rgba(0,0,0,0.3)"}}><span style={{color:$.ac,fontSize:8}}>●</span>0.3 km</div>
-          <div style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:14,padding:"9px 16px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:6,color:$.t1,position:"relative",boxShadow:"0 2px 12px rgba(0,0,0,0.3)"}}>🔭 Nearby{nearby>0&&<span style={{position:"absolute",top:-6,right:-6,background:$.red,borderRadius:10,width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,boxShadow:`0 2px 8px ${$.red}60`}}>{nearby}</span>}</div>
+          <div style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:14,padding:"9px 16px",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:6,color:$.t1,position:"relative",boxShadow:"0 2px 12px rgba(0,0,0,0.3)"}}><IcCompass s={14} c={$.ac}/>Nearby{nearby>0&&<span style={{position:"absolute",top:-6,right:-6,background:$.red,borderRadius:10,width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,boxShadow:`0 2px 8px ${$.red}60`}}>{nearby}</span>}</div>
           {/* Zoom controls */}
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             <button onClick={()=>zoomCenter(1.25)} style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.bl}`,borderRadius:10,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:20,fontWeight:700,color:$.t1,boxShadow:"0 2px 8px rgba(0,0,0,0.3)"}}>+</button>
@@ -135,7 +136,7 @@ const MapPage = ({onVenue,onMenu}) => {
         <div style={{position:"absolute",inset:0,zIndex:200,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)"}} onClick={()=>setShowNearby(false)}>
           <div onClick={e=>e.stopPropagation()} style={{position:"absolute",bottom:0,left:0,right:0,background:$.bg2,borderTop:`1px solid ${$.bl}`,borderRadius:"20px 20px 0 0",maxHeight:"60vh",display:"flex",flexDirection:"column",boxShadow:"0 -8px 40px rgba(0,0,0,0.5)"}}>
             <div style={{padding:"16px 20px 10px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${$.bd}`}}>
-              <div style={{fontSize:15,fontWeight:800,color:$.t1}}>🔭 Nearby Events <span style={{fontSize:12,fontWeight:500,color:$.t2}}>({nearby})</span></div>
+              <div style={{fontSize:15,fontWeight:800,color:$.t1,display:"flex",alignItems:"center",gap:7}}><IcCompass s={16} c={$.ac}/>Nearby Events <span style={{fontSize:12,fontWeight:500,color:$.t2}}>({nearby})</span></div>
               <button onClick={()=>setShowNearby(false)} style={{background:"none",border:"none",color:$.t2,fontSize:20,cursor:"pointer",padding:"0 4px",lineHeight:1}}>×</button>
             </div>
             <div style={{overflowY:"auto",padding:"8px 0"}}>
@@ -174,13 +175,13 @@ const MapPage = ({onVenue,onMenu}) => {
           <div style={{width:48,height:48,borderRadius:"50%",border:`2.5px solid ${$.ac}55`,boxShadow:`0 0 16px ${$.ac}18`,overflow:"hidden",flexShrink:0}}><img src={USER_AVATAR} alt={USER.name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/></div>
           <div><div style={{fontSize:15,fontWeight:800,color:$.t1}}>{USER.level}</div>
           <div style={{width:56,height:5,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"}}><div style={{width:`${(USER.xp/USER.xpMax)*100}%`,height:"100%",background:`linear-gradient(90deg,${$.ac},${$.ac2})`,borderRadius:3}}/></div></div>
-          <button onClick={recenter} title="Re-centre on me" style={{width:38,height:38,borderRadius:12,background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.ac}55`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,boxShadow:`0 0 12px ${$.ac}22, 0 2px 8px rgba(0,0,0,0.3)`}}>📍</button>
+          <button onClick={recenter} title="Re-centre on me" style={{width:38,height:38,borderRadius:12,background:$.glass,backdropFilter:$.blur,border:`1px solid ${$.ac}55`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:`0 0 12px ${$.ac}22, 0 2px 8px rgba(0,0,0,0.3)`}}><IcCrosshair s={18} c={$.ac}/></button>
         </div>
         <button onClick={onMenu} style={{width:64,height:64,borderRadius:"50%",background:`linear-gradient(145deg,${$.red},#B91C2C)`,border:"3px solid rgba(255,255,255,0.18)",boxShadow:`0 6px 28px rgba(230,57,70,0.5), 0 0 48px rgba(230,57,70,0.15), inset 0 -2px 8px rgba(0,0,0,0.3)`,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#fff",position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>
-          <span style={{fontSize:22}}>🔥</span><span style={{fontSize:7,fontWeight:800,letterSpacing:.6,marginTop:-2}}>ActiveSG</span>
+          <IcBolt s={22} c="#fff"/><span style={{fontSize:7,fontWeight:800,letterSpacing:.6,marginTop:1}}>ActiveSG</span>
         </button>
         <div onClick={()=>setShowNearby(true)} style={{background:$.glass,backdropFilter:$.blur,border:`1px solid ${nearby>0?$.ac+"55":$.bl}`,borderRadius:14,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,cursor:"pointer",boxShadow:"0 2px 12px rgba(0,0,0,0.3)",position:"relative"}}>
-          <span style={{fontSize:20}}>🔭</span><div style={{fontSize:10,fontWeight:600,color:nearby>0?$.ac:$.t2,lineHeight:1.3}}>Nearby<br/>Events</div>
+          <IcCompass s={20} c={nearby>0?$.ac:$.t2}/><div style={{fontSize:10,fontWeight:600,color:nearby>0?$.ac:$.t2,lineHeight:1.3}}>Nearby<br/>Events</div>
           {nearby>0&&<span style={{position:"absolute",top:-6,right:-6,background:$.red,borderRadius:10,width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",boxShadow:`0 2px 8px ${$.red}60`}}>{nearby}</span>}
         </div>
       </div>

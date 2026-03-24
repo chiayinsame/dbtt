@@ -1,4 +1,5 @@
 import { SPORTS } from "../../data/mockData";
+import { IcPerson } from "../ui/Icons";
 
 const vstatus = v => { const r=v.players/v.max; return r>=.7?"hot":v.players>=3?"active":v.players>0?"quiet":"empty"; };
 
@@ -12,7 +13,7 @@ const VenueMarker = ({venue:v, onClick}) => {
       </div>
       {alive && (
         <div style={{position:"absolute",top:-20,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.78)",backdropFilter:"blur(8px)",borderRadius:8,padding:"2px 7px",fontSize:9,fontWeight:700,color:"#fff",whiteSpace:"nowrap",border:`1px solid ${c}40`}}>
-          {v.players}/{v.max} 🧑
+          <IcPerson s={10} c="#fff"/>{v.players}/{v.max}
         </div>
       )}
       <div style={{position:"absolute",top:38,left:"50%",transform:"translateX(-50%)",fontSize:8,color:"rgba(255,255,255,0.65)",whiteSpace:"nowrap",fontWeight:600,maxWidth:80,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",textShadow:"0 1px 4px rgba(0,0,0,0.9)",pointerEvents:"none"}}>

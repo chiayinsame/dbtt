@@ -35,11 +35,11 @@ export const FRIENDS = [
   {id:1,name:"Sarah Lim",av:"👩",on:true,ven:"Kallang Wave Mall",sp:"basketball"},
   {id:2,name:"Wei Ming",av:"👨",on:true,ven:"Toa Payoh Sports Hall",sp:"badminton"},
   {id:3,name:"Priya K.",av:"👩‍🦰",on:false,ven:null,sp:null},
-  {id:4,name:"Jun Hao",av:"🧑",on:true,ven:null,sp:null},
+  {id:4,name:"Jun Hao",av:"🧑",on:true,ven:"Orchard ActiveSG",sp:"tennis"},
   {id:5,name:"Aisha N.",av:"🧕",on:true,ven:"Tampines Hub",sp:"badminton"},
-  {id:6,name:"David Chen",av:"👨‍🦲",on:false,ven:null,sp:null},
+  {id:6,name:"David Chen",av:"👨‍🦲",on:true,ven:"Orchard ActiveSG",sp:"tennis"},
   {id:7,name:"Mei Ling",av:"👧",on:true,ven:"Clementi Sports Centre",sp:"tennis"},
-  {id:8,name:"Ravi S.",av:"👨‍🦱",on:false,ven:null,sp:null},
+  {id:8,name:"Ravi S.",av:"👨‍🦱",on:true,ven:"Orchard ActiveSG",sp:"tennis"},
 ];
 export const LFG = [
   {id:101,name:"Marcus T.",av:"🧔",sp:"basketball",ven:"Kallang Wave Mall",msg:"1 more for 3v3"},

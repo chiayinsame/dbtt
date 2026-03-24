@@ -1,7 +1,9 @@
-import { SPORTS, vstatus } from "../../data/mockData";
+import { SPORTS, vstatus, FRIENDS } from "../../data/mockData";
+import { FRIEND_AVATARS } from "../../images/avatars";
 import $ from "../../theme/tokens";
 
 const VenueTower = ({venue:v,onClick,pp}) => {
+  const friendsHere = FRIENDS.filter(f => f.on && f.ven === v.name);
   const sp=SPORTS[v.sport], st=vstatus(v), c=sp.hue,
     need=v.max-v.players,
     hot=st==="hot", act=st==="active", alive=st!=="empty",
@@ -47,9 +49,20 @@ const VenueTower = ({venue:v,onClick,pp}) => {
       )}
       {v.players >= 3 && (
         <div style={{position:"absolute",bottom:2,left:"50%",transform:"translateX(-50%)",display:"flex",pointerEvents:"none"}}>
-          {Array.from({length:Math.min(v.players,5)}).map((_,i)=>(
-            <div key={i} style={{width:16,height:16,borderRadius:8,marginLeft:i>0?-5:0,background:`hsl(${i*55+180},55%,60%)`,border:"2px solid rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:7}}>{"👤👩🧑👨👧"[i%5]}</div>
-          ))}
+          {Array.from({length:Math.min(v.players,5)}).map((_,i)=>{
+            const friend = friendsHere[i];
+            if (friend) {
+              const idx = FRIENDS.findIndex(f => f.id === friend.id);
+              return (
+                <img key={i} src={FRIEND_AVATARS[idx % FRIEND_AVATARS.length]} alt={friend.name} title={friend.name} style={{width:18,height:18,borderRadius:9,marginLeft:i>0?-5:0,objectFit:"cover",border:`2px solid ${c}`,boxShadow:`0 0 6px ${c}60`,zIndex:5-i,flexShrink:0}}/>
+              );
+            }
+            return (
+              <div key={i} style={{width:16,height:16,borderRadius:8,marginLeft:i>0?-5:0,background:`hsl(${i*55+180},55%,60%)`,border:"2px solid rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:5-i}}>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="rgba(0,0,0,0.55)" stroke="none"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
