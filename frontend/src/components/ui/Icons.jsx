@@ -122,3 +122,16 @@ export const IcTicket = ({s=20,c="currentColor"}) => <S w={s} c={c}>
   <line x1="9" y1="9" x2="15" y2="15"/>
   <line x1="15" y1="9" x2="9" y2="15"/>
 </S>;
+
+// Classes / graduation cap
+export const IcGrad = ({s=20,c="currentColor"}) => <S w={s} c={c}>
+  <path d="M22 10l-10-5L2 10l10 5 10-5z"/>
+  <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5"/>
+  <line x1="22" y1="10" x2="22" y2="16"/>
+</S>;
+
+// Play / video icon for lessons
+export const IcPlay = ({s=20,c="currentColor"}) => <S w={s} c={c}>
+  <circle cx="12" cy="12" r="10"/>
+  <polygon points="10 8 16 12 10 16 10 8" fill={c} stroke="none"/>
+</S>;

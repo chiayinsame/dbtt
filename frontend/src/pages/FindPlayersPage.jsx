@@ -270,7 +270,7 @@ function DemoUserPicker({ onPick, onBack }) {
   }, []);
 
   return (
-    <Shell title="Quick Demo">
+    <Shell title="Quick Demo" onBack={onBack}>
       <Card style={{ marginBottom: 16, textAlign: "center", padding: "20px 16px" }}>
         <div style={{ fontSize: 32, marginBottom: 8 }}>⚡</div>
         <div style={{ fontSize: 13, color: $.t2, lineHeight: 1.5 }}>
@@ -320,7 +320,7 @@ function DemoUserPicker({ onPick, onBack }) {
 /* ══════════════════════════════════════════════════════════════════════════
    MAIN PAGE
    ══════════════════════════════════════════════════════════════════════════ */
-export default function FindPlayersPage() {
+export default function FindPlayersPage({onBack}) {
   // Steps: "form" | "demo" | "loading" | "results" | "confirmed"
   const [step, setStep] = useState("form");
   const [config, setConfig] = useState(null);
@@ -446,7 +446,7 @@ export default function FindPlayersPage() {
   /* ── ONBOARDING FORM ─────────────────────────────────────────────────── */
   if (step === "form") {
     return (
-      <Shell title="Find Game">
+      <Shell title="Find Game" onBack={onBack}>
         {configError && (
           <div style={{
             background: `${$.red}15`, border: `1px solid ${$.red}30`, borderRadius: 10,
@@ -578,7 +578,7 @@ export default function FindPlayersPage() {
   /* ── LOADING ─────────────────────────────────────────────────────────── */
   if (step === "loading") {
     return (
-      <Shell title="Find Game">
+      <Shell title="Find Game" onBack={onBack}>
         <div style={{ textAlign: "center", padding: "80px 0" }}>
           <div style={{ fontSize: 48, animation: "a-pulse 1.5s ease infinite", display: "inline-block" }}>🎯</div>
           <div style={{ marginTop: 20, fontSize: 17, fontWeight: 700 }}>Scanning courts across Singapore...</div>
@@ -594,7 +594,7 @@ export default function FindPlayersPage() {
   if (step === "confirmed" && confirmedVenue) {
     const bestCourt = confirmedVenue.court_details[0];
     return (
-      <Shell title="Find Game">
+      <Shell title="Find Game" onBack={onBack}>
         <div style={{ textAlign: "center", padding: "40px 0" }}>
           <div style={{ fontSize: 52, marginBottom: 16, animation: "a-pop .4s ease" }}>🎉</div>
           <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>You're on your way!</div>
@@ -688,7 +688,7 @@ export default function FindPlayersPage() {
   const totalCourts = venueResults.reduce((s, v) => s + v.courts_available, 0);
 
   return (
-    <Shell title="Find Game">
+    <Shell title="Find Game" onBack={onBack}>
       {/* User badge */}
       {userProfile && (
         <div style={{

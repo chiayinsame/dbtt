@@ -12,6 +12,8 @@ import WorkoutsPage from "./pages/WorkoutsPage";
 import BookingsPage from "./pages/BookingsPage";
 import FriendsPage from "./pages/FriendsPage";
 import FindPlayersPage from "./pages/FindPlayersPage";
+import ClassesPage from "./pages/ClassesPage";
+import LessonsPage from "./pages/LessonsPage";
 import VenueSheet from "./components/venue/VenueSheet";
 import BookModal from "./components/venue/BookingModal";
 
@@ -22,16 +24,19 @@ export default function App() {
   const [selV, setSelV] = useState(null);
   const [bookV, setBookV] = useState(null);
   const nav = id => { setSelV(null); setScr(id); };
+  const goHome = () => nav("map");
 
   const pages = (
     <>
       {scr === "map"      && <MapPage onVenue={v => setSelV(v)} onMenu={() => setMenu(true)} />}
-      {scr === "search"   && <SearchPage />}
-      {scr === "profile"  && <ProfilePage />}
-      {scr === "workouts" && <WorkoutsPage />}
-      {scr === "bookings" && <BookingsPage />}
-      {scr === "friends"  && <FriendsPage />}
-      {scr === "players"  && <FindPlayersPage />}
+      {scr === "search"   && <SearchPage onBack={goHome} />}
+      {scr === "profile"  && <ProfilePage onBack={goHome} />}
+      {scr === "workouts" && <WorkoutsPage onBack={goHome} />}
+      {scr === "bookings" && <BookingsPage onBack={goHome} />}
+      {scr === "friends"  && <FriendsPage onBack={goHome} />}
+      {scr === "players"  && <FindPlayersPage onBack={goHome} />}
+      {scr === "classes"  && <ClassesPage onBack={goHome} />}
+      {scr === "lessons"  && <LessonsPage onBack={goHome} />}
       {scr === "map" && selV && <VenueSheet venue={selV} onClose={() => setSelV(null)} onBook={v => { setSelV(null); setBookV(v); }} />}
       {menu && <MenuOverlay onClose={() => setMenu(false)} onNav={nav} />}
       {bookV && <BookModal venue={bookV} onClose={() => setBookV(null)} />}

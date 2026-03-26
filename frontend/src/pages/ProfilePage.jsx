@@ -4,7 +4,7 @@ import $ from "../theme/tokens";
 import Shell from "../components/ui/PageShell";
 import Card from "../components/ui/GlassCard";
 
-const ProfilePage = () => <Shell title="Profile">
+const ProfilePage = ({onBack}) => <Shell title="Profile" onBack={onBack}>
   <div style={{background:`linear-gradient(145deg,${$.ac}10,${$.ac2}06)`,borderRadius:22,padding:30,textAlign:"center",border:`1px solid ${$.ac}15`,marginBottom:20}}>
     <div style={{width:88,height:88,borderRadius:"50%",background:`linear-gradient(145deg,${$.ac},${$.ac2})`,margin:"0 auto 14px",boxShadow:`0 0 36px ${$.ac}30`,overflow:"hidden"}}><img src={USER_AVATAR} alt={USER.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/></div>
     <div style={{fontSize:24,fontWeight:900}}>{USER.name}</div><div style={{fontSize:13,color:$.t2,marginTop:4}}>Level {USER.level} · ActiveSG Member</div>
