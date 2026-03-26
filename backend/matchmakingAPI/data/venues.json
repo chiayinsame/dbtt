@@ -1,0 +1,147 @@
+{
+  "Kallang Badminton Hall": {
+    "lat": 1.302,
+    "lon": 103.875,
+    "sports": ["Badminton"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 3},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C4", "sport": "Badminton", "capacity": 4, "current_occupancy": 4},
+      {"court_id": "C5", "sport": "Badminton", "capacity": 4, "current_occupancy": 1},
+      {"court_id": "C6", "sport": "Badminton", "capacity": 4, "current_occupancy": 0}
+    ]
+  },
+  "Jurong East Sports Centre": {
+    "lat": 1.333,
+    "lon": 103.742,
+    "sports": ["Badminton", "Basketball", "Table Tennis"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 6},
+      {"court_id": "C4", "sport": "Basketball", "capacity": 10, "current_occupancy": 0},
+      {"court_id": "C5", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C6", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 0}
+    ]
+  },
+  "Tampines Sports Hall": {
+    "lat": 1.353,
+    "lon": 103.944,
+    "sports": ["Badminton", "Basketball", "Volleyball"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 3},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 4},
+      {"court_id": "C4", "sport": "Volleyball", "capacity": 12, "current_occupancy": 8},
+      {"court_id": "C5", "sport": "Volleyball", "capacity": 12, "current_occupancy": 0}
+    ]
+  },
+  "Bishan Sports Hall": {
+    "lat": 1.351,
+    "lon": 103.848,
+    "sports": ["Badminton", "Basketball", "Table Tennis"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 1},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 7},
+      {"court_id": "C4", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C5", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 0}
+    ]
+  },
+  "Clementi Sports Hall": {
+    "lat": 1.315,
+    "lon": 103.765,
+    "sports": ["Badminton", "Basketball", "Volleyball"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 3},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 0},
+      {"court_id": "C4", "sport": "Volleyball", "capacity": 12, "current_occupancy": 6}
+    ]
+  },
+  "Yio Chu Kang Sports Hall": {
+    "lat": 1.382,
+    "lon": 103.845,
+    "sports": ["Badminton", "Table Tennis"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 1},
+      {"court_id": "C4", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 0}
+    ]
+  },
+  "Sengkang Sports Centre": {
+    "lat": 1.392,
+    "lon": 103.895,
+    "sports": ["Badminton", "Basketball", "Swimming"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 3},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 5},
+      {"court_id": "C4", "sport": "Basketball", "capacity": 10, "current_occupancy": 0},
+      {"court_id": "C5", "sport": "Swimming", "capacity": 30, "current_occupancy": 12}
+    ]
+  },
+  "Hougang Sports Centre": {
+    "lat": 1.371,
+    "lon": 103.893,
+    "sports": ["Badminton", "Basketball", "Table Tennis"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 8},
+      {"court_id": "C4", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C5", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 3}
+    ]
+  },
+  "Woodlands Sports Centre": {
+    "lat": 1.437,
+    "lon": 103.786,
+    "sports": ["Badminton", "Basketball", "Football"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 1},
+      {"court_id": "C3", "sport": "Basketball", "capacity": 10, "current_occupancy": 0},
+      {"court_id": "C4", "sport": "Football", "capacity": 22, "current_occupancy": 14},
+      {"court_id": "C5", "sport": "Football", "capacity": 22, "current_occupancy": 0}
+    ]
+  },
+  "Pasir Ris Sports Centre": {
+    "lat": 1.373,
+    "lon": 103.949,
+    "sports": ["Badminton", "Tennis", "Swimming"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C3", "sport": "Tennis", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C4", "sport": "Tennis", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C5", "sport": "Swimming", "capacity": 30, "current_occupancy": 18}
+    ]
+  },
+  "Toa Payoh Sports Hall": {
+    "lat": 1.334,
+    "lon": 103.851,
+    "sports": ["Badminton", "Basketball", "Table Tennis"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 4},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 1},
+      {"court_id": "C3", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C4", "sport": "Basketball", "capacity": 10, "current_occupancy": 3},
+      {"court_id": "C5", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C6", "sport": "Table Tennis", "capacity": 4, "current_occupancy": 0}
+    ]
+  },
+  "Choa Chu Kang Sports Centre": {
+    "lat": 1.385,
+    "lon": 103.744,
+    "sports": ["Badminton", "Football", "Basketball"],
+    "courts": [
+      {"court_id": "C1", "sport": "Badminton", "capacity": 4, "current_occupancy": 0},
+      {"court_id": "C2", "sport": "Badminton", "capacity": 4, "current_occupancy": 2},
+      {"court_id": "C3", "sport": "Football", "capacity": 22, "current_occupancy": 11},
+      {"court_id": "C4", "sport": "Football", "capacity": 22, "current_occupancy": 0},
+      {"court_id": "C5", "sport": "Basketball", "capacity": 10, "current_occupancy": 4}
+    ]
+  }
+}
