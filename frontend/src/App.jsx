@@ -8,7 +8,7 @@ import MenuOverlay from "./components/nav/MenuOverlay";
 import MapPage from "./pages/MapPage";
 import SearchPage from "./pages/SearchPage";
 import ProfilePage from "./pages/ProfilePage";
-import WorkoutsPage from "./pages/WorkoutsPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 import BookingsPage from "./pages/BookingsPage";
 import FriendsPage from "./pages/FriendsPage";
 import FindPlayersPage from "./pages/FindPlayersPage";
@@ -34,7 +34,7 @@ export default function App() {
       {scr === "map"      && <MapPage onVenue={v => setSelV(v)} onMenu={() => setMenu(true)} />}
       {scr === "search"   && <SearchPage onBack={goHome} />}
       {scr === "profile"  && <ProfilePage onBack={goHome} credits={credits} onNav={nav} />}
-      {scr === "workouts" && <WorkoutsPage onBack={goHome} />}
+      {scr === "leaderboard" && <LeaderboardPage onBack={goHome} />}
       {scr === "bookings" && <BookingsPage onBack={goHome} />}
       {scr === "friends"  && <FriendsPage onBack={goHome} />}
       {scr === "players"  && <FindPlayersPage onBack={goHome} />}

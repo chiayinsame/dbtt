@@ -1,16 +1,18 @@
 import $ from "../../theme/tokens";
-import { IcGrad, IcPlay, IcUsers, IcX } from "../ui/Icons";
+import { IcGrad, IcPlay, IcUsers, IcX, IcTrophy } from "../ui/Icons";
 
 const MenuOverlay = ({onClose,onNav}) => {
   const items=[
-    {id:"classes", Ic:IcGrad, lb:"Classes"},
-    {id:"lessons", Ic:IcPlay, lb:"Lessons"},
-    {id:"friends", Ic:IcUsers,lb:"Friends"},
+    {id:"classes",     Ic:IcGrad,    lb:"Classes"},
+    {id:"lessons",     Ic:IcPlay,    lb:"Lessons"},
+    {id:"friends",     Ic:IcUsers,   lb:"Friends"},
+    {id:"leaderboard", Ic:IcTrophy,  lb:"Leaderboard"},
   ];
   const pos=[
-    {top:"40%",left:"18%"},
-    {top:"40%",right:"18%"},
-    {top:"56%",left:"50%",transform:"translateX(-50%)"},
+    {top:"32%",left:"18%"},
+    {top:"32%",right:"18%"},
+    {top:"54%",left:"18%"},
+    {top:"54%",right:"18%"},
   ];
   return <div style={{position:"absolute",inset:0,zIndex:95,background:`linear-gradient(180deg,rgba(8,20,38,0.96),rgba(4,10,20,0.98))`,backdropFilter:"blur(32px)",animation:"a-fade .2s",fontFamily:$.font}}>
     {items.map((it,i)=><button key={it.id} onClick={()=>{onNav(it.id);onClose()}} style={{position:"absolute",...pos[i],background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:10,color:$.t1,animation:`a-pop .3s cubic-bezier(.34,1.56,.64,1) ${i*.05}s both`}}>

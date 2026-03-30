@@ -1,12 +1,11 @@
 import $ from "../../theme/tokens";
 import { useBreakpoint } from "../../hooks/useBreakpoint";
-import { IcMap, IcSearch, IcDumbbell, IcCalendar, IcUsers, IcUser, IcTarget, IcLocker } from "../ui/Icons";
+import { IcMap, IcSearch, IcCalendar, IcUsers, IcUser, IcTarget, IcLocker } from "../ui/Icons";
 
 const TABS = [
   {id:"map",      Ic:IcMap,      lb:"Home"},
   {id:"search",   Ic:IcSearch,   lb:"Search"},
   {id:"players",  Ic:IcTarget,   lb:"Find Game"},
-  {id:"workouts", Ic:IcDumbbell, lb:"Workouts"},
   {id:"bookings", Ic:IcCalendar, lb:"Bookings"},
   {id:"locker",   Ic:IcLocker,   lb:"Locker"},
   {id:"friends",  Ic:IcUsers,    lb:"Friends"},
