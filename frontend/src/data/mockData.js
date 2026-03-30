@@ -29,7 +29,8 @@ export const VENUES = [
 ];
 
 export const vstatus = v => { const r=v.players/v.max; return r>=.7?"hot":v.players>=3?"active":v.players>0?"quiet":"empty"; };
-export const USER = {name:"Alex Tan",level:43,xp:7200,xpMax:10000,avatar:"🏃",gamesPlayed:156,hoursActive:312,friendCount:28,streak:7};
+export const USER = {name:"Alex Tan",level:43,xp:7200,xpMax:10000,avatar:"🏃",gamesPlayed:156,hoursActive:312,friendCount:28,streak:7,activeSGCredits:500};
+export const USER_ID = "U0001";
 
 export const FRIENDS = [
   {id:1,name:"Sarah Lim",av:"👩",on:true,ven:"Kallang Wave Mall",sp:"basketball"},

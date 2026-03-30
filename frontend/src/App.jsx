@@ -12,8 +12,12 @@ import WorkoutsPage from "./pages/WorkoutsPage";
 import BookingsPage from "./pages/BookingsPage";
 import FriendsPage from "./pages/FriendsPage";
 import FindPlayersPage from "./pages/FindPlayersPage";
+import ClassesPage from "./pages/ClassesPage";
+import LessonsPage from "./pages/LessonsPage";
+import LockerPage from "./pages/LockerPage";
 import VenueSheet from "./components/venue/VenueSheet";
 import BookModal from "./components/venue/BookingModal";
+import { USER } from "./data/mockData";
 
 export default function App() {
   const { isDesktop } = useBreakpoint();
@@ -21,17 +25,22 @@ export default function App() {
   const [menu, setMenu] = useState(false);
   const [selV, setSelV] = useState(null);
   const [bookV, setBookV] = useState(null);
+  const [credits, setCredits] = useState(USER.activeSGCredits);
   const nav = id => { setSelV(null); setScr(id); };
+  const goHome = () => nav("map");
 
   const pages = (
     <>
       {scr === "map"      && <MapPage onVenue={v => setSelV(v)} onMenu={() => setMenu(true)} />}
-      {scr === "search"   && <SearchPage />}
-      {scr === "profile"  && <ProfilePage />}
-      {scr === "workouts" && <WorkoutsPage />}
-      {scr === "bookings" && <BookingsPage />}
-      {scr === "friends"  && <FriendsPage />}
-      {scr === "players"  && <FindPlayersPage />}
+      {scr === "search"   && <SearchPage onBack={goHome} />}
+      {scr === "profile"  && <ProfilePage onBack={goHome} credits={credits} onNav={nav} />}
+      {scr === "workouts" && <WorkoutsPage onBack={goHome} />}
+      {scr === "bookings" && <BookingsPage onBack={goHome} />}
+      {scr === "friends"  && <FriendsPage onBack={goHome} />}
+      {scr === "players"  && <FindPlayersPage onBack={goHome} />}
+      {scr === "classes"  && <ClassesPage onBack={goHome} />}
+      {scr === "lessons"  && <LessonsPage onBack={goHome} />}
+      {scr === "locker"   && <LockerPage onBack={goHome} credits={credits} setCredits={setCredits} />}
       {scr === "map" && selV && <VenueSheet venue={selV} onClose={() => setSelV(null)} onBook={v => { setSelV(null); setBookV(v); }} />}
       {menu && <MenuOverlay onClose={() => setMenu(false)} onNav={nav} />}
       {bookV && <BookModal venue={bookV} onClose={() => setBookV(null)} />}
@@ -42,7 +51,7 @@ export default function App() {
     return (
       <div style={{display:"flex",height:"100%",width:"100%",background:$.bg,fontFamily:$.font,color:$.t1,overflow:"hidden"}}>
         <GlobalCSS />
-        <BottomNav active={scr} onNav={nav} />
+        <BottomNav active={scr} onNav={nav} credits={credits} />
         <div style={{flex:1,position:"relative",overflow:"hidden"}}>
           {pages}
         </div>
@@ -53,7 +62,7 @@ export default function App() {
   return (
     <div style={{width:"100%",height:"100%",position:"relative",overflow:"hidden",fontFamily:$.font,color:$.t1,background:$.bg}}>
       <GlobalCSS />
-      <StatusBar />
+      <StatusBar credits={credits} />
       {pages}
       <BottomNav active={scr} onNav={nav} />
     </div>

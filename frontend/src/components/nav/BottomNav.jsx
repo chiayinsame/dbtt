@@ -1,6 +1,6 @@
 import $ from "../../theme/tokens";
 import { useBreakpoint } from "../../hooks/useBreakpoint";
-import { IcMap, IcSearch, IcDumbbell, IcCalendar, IcUsers, IcUser, IcTarget } from "../ui/Icons";
+import { IcMap, IcSearch, IcDumbbell, IcCalendar, IcUsers, IcUser, IcTarget, IcLocker } from "../ui/Icons";
 
 const TABS = [
   {id:"map",      Ic:IcMap,      lb:"Home"},
@@ -8,11 +8,12 @@ const TABS = [
   {id:"players",  Ic:IcTarget,   lb:"Find Game"},
   {id:"workouts", Ic:IcDumbbell, lb:"Workouts"},
   {id:"bookings", Ic:IcCalendar, lb:"Bookings"},
+  {id:"locker",   Ic:IcLocker,   lb:"Locker"},
   {id:"friends",  Ic:IcUsers,    lb:"Friends"},
   {id:"profile",  Ic:IcUser,     lb:"Profile"},
 ];
 
-const BottomNav = ({active, onNav}) => {
+const BottomNav = ({active, onNav, credits}) => {
   const { isDesktop } = useBreakpoint();
 
   if (isDesktop) {
@@ -43,8 +44,17 @@ const BottomNav = ({active, onNav}) => {
           })}
         </nav>
 
-        {/* Footer */}
+        {/* Credits + Footer */}
         <div style={{padding:"16px 20px",borderTop:`1px solid ${$.bd}`}}>
+          {credits !== undefined && (
+            <div style={{display:"flex",alignItems:"center",gap:8,background:`${$.ac}12`,border:`1px solid ${$.ac}25`,borderRadius:12,padding:"10px 12px",marginBottom:12,cursor:"pointer"}} onClick={() => onNav("locker")}>
+              <span style={{fontSize:18}}>🏅</span>
+              <div>
+                <div style={{fontSize:15,fontWeight:900,color:$.ac,lineHeight:1}}>{credits}</div>
+                <div style={{fontSize:10,color:$.t3,marginTop:2}}>ActiveSG Credits</div>
+              </div>
+            </div>
+          )}
           <div style={{fontSize:10,color:$.t3,fontWeight:600,letterSpacing:.5}}>ActiveSG © 2026</div>
         </div>
       </div>
@@ -52,7 +62,7 @@ const BottomNav = ({active, onNav}) => {
   }
 
   // Mobile bottom bar
-  const mobileTabs = TABS.filter(t => ["map","search","players","bookings","profile"].includes(t.id));
+  const mobileTabs = TABS.filter(t => ["map","search","players","locker","bookings","profile"].includes(t.id));
   return (
     <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:90,background:$.glass,backdropFilter:$.blur,borderTop:`1px solid ${$.bd}`,paddingBottom:10}}>
       <div style={{display:"flex",justifyContent:"space-around",padding:"9px 0 3px"}}>

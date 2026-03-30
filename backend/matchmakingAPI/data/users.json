@@ -18,7 +18,8 @@
     "user_rating": 4.5,
     "is_active": false,
     "current_venue": null,
-    "looking_for_match": false
+    "looking_for_match": false,
+    "activeSGCredits": 700
   },
   {
     "user_id": "U0002",
@@ -1811,29 +1812,6 @@
       "Weekend Morning",
       "Weekday Evening",
       "Weekend Evening"
-    ],
-    "total_sessions": 0,
-    "user_rating": 3.0,
-    "is_active": true,
-    "current_venue": "Tampines Sports Hall",
-    "looking_for_match": true
-  },
-  {
-    "user_id": "U0084",
-    "display_name": "chu ayin",
-    "age_group": "30-39",
-    "primary_sport": "Badminton",
-    "secondary_sport": "Basketball",
-    "skill_level": "Intermediate",
-    "play_style": "Regular",
-    "home_venue": "Tampines Sports Hall",
-    "latitude": 1.353,
-    "longitude": 103.944,
-    "availability": [
-      "Weekday Afternoon",
-      "Weekday Evening",
-      "Weekend Morning",
-      "Weekend Afternoon"
     ],
     "total_sessions": 0,
     "user_rating": 3.0,

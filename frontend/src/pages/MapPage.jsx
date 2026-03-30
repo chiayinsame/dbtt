@@ -98,7 +98,7 @@ const MapPage = ({onVenue,onMenu}) => {
   const zoomLabel = zoom < 0.65 ? "overview" : zoom > 1.5 ? "close-up" : `${Math.round(zoom * 100)}%`;
 
   return (
-    <div ref={containerRef} style={{position:"absolute",inset:0,overflow:"hidden",background:`radial-gradient(ellipse at 40% 30%, #0C2440 0%, ${$.bg} 50%, #040A14 100%)`}} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
+    <div ref={containerRef} style={{position:"absolute",inset:0,overflow:"hidden",background:"#1a2430"}} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}>
 
       {/* ── HUD Top ── */}
       <div style={{position:"absolute",top:isDesktop?16:48,left:16,right:16,zIndex:50,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>

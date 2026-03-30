@@ -25,13 +25,15 @@ import pickle
 import numpy as np
 import pandas as pd
 import os
+from datetime import datetime, timedelta
+import uuid
 
 app = Flask(__name__)
 CORS(app)  # Allow React frontend to call this API
 
 # ── Load data & model ─────────────────────────────────────────────────────────
 
-DATA_DIR = 'data'
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def load_data():
@@ -45,10 +47,35 @@ def load_data():
         scaler = pickle.load(f)
     with open(f'{DATA_DIR}/feature_columns.json', 'r') as f:
         feature_cols = json.load(f)
-    return users, venues, model, scaler, feature_cols
+    with open(f'{DATA_DIR}/lockers.json', 'r') as f:
+        lockers = json.load(f)
+    with open(f'{DATA_DIR}/rentals.json', 'r') as f:
+        rentals = json.load(f)
+    return users, venues, model, scaler, feature_cols, lockers, rentals
 
 
-users, venues, model, scaler, feature_cols = load_data()
+users, venues, model, scaler, feature_cols, lockers, rentals = load_data()
+
+DEFAULT_CREDITS = 500
+
+
+def get_user_credits(user):
+    return user.get('activeSGCredits', DEFAULT_CREDITS)
+
+
+def save_users():
+    with open(f'{DATA_DIR}/users.json', 'w') as f:
+        json.dump(users, f, indent=2)
+
+
+def save_lockers():
+    with open(f'{DATA_DIR}/lockers.json', 'w') as f:
+        json.dump(lockers, f, indent=2)
+
+
+def save_rentals():
+    with open(f'{DATA_DIR}/rentals.json', 'w') as f:
+        json.dump(rentals, f, indent=2)
 
 
 # ── Feature engineering (same logic as training) ──────────────────────────────
@@ -533,6 +560,164 @@ def get_config():
     })
 
 
+# ── Locker / Rental Endpoints ─────────────────────────────────────────────────
+
+@app.route('/api/credits/<user_id>', methods=['GET'])
+def get_credits(user_id):
+    """Get a user's ActiveSG credit balance."""
+    user = next((u for u in users if u['user_id'] == user_id), None)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    return jsonify({'user_id': user_id, 'credits': get_user_credits(user)})
+
+
+@app.route('/api/credits/<user_id>/topup', methods=['POST'])
+def topup_credits(user_id):
+    """Add credits to a user's balance (for testing / demo top-up)."""
+    user = next((u for u in users if u['user_id'] == user_id), None)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    amount = request.json.get('amount', 100)
+    if not isinstance(amount, (int, float)) or amount <= 0:
+        return jsonify({'error': 'Invalid amount'}), 400
+    user['activeSGCredits'] = get_user_credits(user) + int(amount)
+    save_users()
+    return jsonify({'user_id': user_id, 'credits': user['activeSGCredits']})
+
+
+@app.route('/api/lockers', methods=['GET'])
+def get_lockers():
+    """List lockers. Filter by ?venue=... and/or ?available=true."""
+    result = list(lockers)
+    if request.args.get('venue'):
+        result = [l for l in result if l['venue'] == request.args.get('venue')]
+    if request.args.get('available') == 'true':
+        result = [l for l in result if l.get('available', True)]
+    return jsonify(result)
+
+
+@app.route('/api/lockers/<locker_id>', methods=['GET'])
+def get_locker(locker_id):
+    """Get a single locker by ID."""
+    locker = next((l for l in lockers if l['id'] == locker_id), None)
+    if not locker:
+        return jsonify({'error': 'Locker not found'}), 404
+    return jsonify(locker)
+
+
+@app.route('/api/rent', methods=['POST'])
+def rent_locker():
+    """
+    Rent equipment from a locker.
+    Body: { "user_id": "U0001", "locker_id": "L001", "duration_hours": 1 }
+    Deducts credits and marks the locker as unavailable.
+    """
+    data = request.json or {}
+    user_id = data.get('user_id')
+    locker_id = data.get('locker_id')
+    duration = int(data.get('duration_hours', 1))
+
+    if not user_id or not locker_id:
+        return jsonify({'error': 'user_id and locker_id are required'}), 400
+    if duration not in [1, 2, 3]:
+        return jsonify({'error': 'duration_hours must be 1, 2, or 3'}), 400
+
+    user = next((u for u in users if u['user_id'] == user_id), None)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    locker = next((l for l in lockers if l['id'] == locker_id), None)
+    if not locker:
+        return jsonify({'error': 'Locker not found'}), 404
+
+    if not locker.get('available', True):
+        return jsonify({'error': 'Locker is not available'}), 409
+
+    total_cost = locker['cost_per_hour'] * duration
+    current_credits = get_user_credits(user)
+
+    if current_credits < total_cost:
+        return jsonify({'error': 'Insufficient credits', 'credits': current_credits, 'required': total_cost}), 402
+
+    # Deduct credits
+    user['activeSGCredits'] = current_credits - total_cost
+
+    # Mark locker unavailable
+    locker['available'] = False
+
+    # Create rental record
+    now = datetime.utcnow()
+    rental = {
+        'rental_id': f'R{str(uuid.uuid4())[:8].upper()}',
+        'user_id': user_id,
+        'locker_id': locker_id,
+        'locker_number': locker['locker_number'],
+        'equipment': locker['equipment'],
+        'venue': locker['venue'],
+        'cost_per_hour': locker['cost_per_hour'],
+        'duration_hours': duration,
+        'total_cost': total_cost,
+        'start_time': now.isoformat(),
+        'end_time': (now + timedelta(hours=duration)).isoformat(),
+        'status': 'active',
+    }
+    rentals.append(rental)
+
+    save_users()
+    save_lockers()
+    save_rentals()
+
+    return jsonify({
+        'message': 'Rental started successfully',
+        'rental': rental,
+        'credits_remaining': user['activeSGCredits'],
+    }), 201
+
+
+@app.route('/api/return', methods=['POST'])
+def return_equipment():
+    """
+    Return rented equipment.
+    Body: { "rental_id": "RXXXXXXXX" }
+    Marks the rental as returned and the locker as available again.
+    """
+    data = request.json or {}
+    rental_id = data.get('rental_id')
+    if not rental_id:
+        return jsonify({'error': 'rental_id is required'}), 400
+
+    rental = next((r for r in rentals if r['rental_id'] == rental_id), None)
+    if not rental:
+        return jsonify({'error': 'Rental not found'}), 404
+    if rental['status'] != 'active':
+        return jsonify({'error': 'Rental is already returned'}), 409
+
+    rental['status'] = 'returned'
+    rental['returned_time'] = datetime.utcnow().isoformat()
+
+    # Re-mark the locker as available
+    locker = next((l for l in lockers if l['id'] == rental['locker_id']), None)
+    if locker:
+        locker['available'] = True
+
+    save_rentals()
+    save_lockers()
+
+    return jsonify({'message': 'Equipment returned successfully', 'rental': rental})
+
+
+@app.route('/api/rentals/<user_id>', methods=['GET'])
+def get_rentals(user_id):
+    """Get all rentals for a user. Filter by ?status=active|returned."""
+    user_rentals = [r for r in rentals if r['user_id'] == user_id]
+    status_filter = request.args.get('status')
+    if status_filter:
+        user_rentals = [r for r in user_rentals if r['status'] == status_filter]
+    # Most recent first
+    user_rentals = sorted(user_rentals, key=lambda r: r['start_time'], reverse=True)
+    return jsonify(user_rentals)
+
+
 # ── Run ───────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
@@ -543,10 +728,11 @@ if __name__ == '__main__':
     print("=" * 50)
     print("ActiveSG Matchmaking API")
     print("=" * 50)
-    print(f"Users loaded:  {len(users)}")
-    print(f"Venues loaded: {len(venues)}")
-    print(f"Active users:  {sum(1 for u in users if u.get('is_active'))}")
-    print(f"Looking:       {sum(1 for u in users if u.get('looking_for_match'))}")
+    print(f"Users loaded:   {len(users)}")
+    print(f"Venues loaded:  {len(venues)}")
+    print(f"Lockers loaded: {len(lockers)}")
+    print(f"Active users:   {sum(1 for u in users if u.get('is_active'))}")
+    print(f"Looking:        {sum(1 for u in users if u.get('looking_for_match'))}")
     print()
     print("Endpoints:")
     print("  GET  /api/config                    - form dropdown options")
