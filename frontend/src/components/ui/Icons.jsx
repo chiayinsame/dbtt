@@ -143,6 +143,15 @@ export const IcLocker = ({s=20,c="currentColor"}) => <S w={s} c={c}>
   <circle cx="12" cy="16" r="1" fill={c} stroke="none"/>
 </S>;
 
+// Trophy / leaderboard icon
+export const IcTrophy = ({s=20,c="currentColor"}) => <S w={s} c={c}>
+  <path d="M8 21h8M12 17v4"/>
+  <path d="M7 3h10l-1.5 9h-7L7 3z"/>
+  <path d="M6 3H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4"/>
+  <path d="M18 3h2a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/>
+  <line x1="9" y1="21" x2="15" y2="21"/>
+</S>;
+
 // QR code icon for scanning
 export const IcQR = ({s=20,c="currentColor"}) => <S w={s} c={c}>
   <rect x="3" y="3" width="7" height="7" rx="1"/>

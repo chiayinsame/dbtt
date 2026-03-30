@@ -67,3 +67,29 @@ export const WKCH = [{d:"M",m:90},{d:"T",m:0},{d:"W",m:60},{d:"T",m:45},{d:"F",m
 export const CATS = [{name:"Racket Sports",ic:"🏸",cl:"#00D68F",n:24},{name:"Team Sports",ic:"⚽",cl:"#A855F7",n:18},{name:"Water Sports",ic:"🏊",cl:"#00B4D8",n:12},{name:"Fitness",ic:"💪",cl:"#F43F5E",n:31}];
 export const MW = 3200;
 export const MH = 1800;
+
+export const LEADERBOARD_STEPS = [
+  {rank:1,  name:"Wei Ming",   av:"👨",   steps:87420, isYou:false, delta:2},
+  {rank:2,  name:"Sarah Lim",  av:"👩",   steps:76850, isYou:false, delta:1},
+  {rank:3,  name:"Priya K.",   av:"👩‍🦰", steps:71200, isYou:false, delta:-1},
+  {rank:4,  name:"Alex Tan",   av:"🏃",   steps:68900, isYou:true,  delta:0},
+  {rank:5,  name:"Jun Hao",    av:"🧑",   steps:62100, isYou:false, delta:3},
+  {rank:6,  name:"Aisha N.",   av:"🧕",   steps:58700, isYou:false, delta:-2},
+  {rank:7,  name:"David Chen", av:"👨‍🦲", steps:51200, isYou:false, delta:-1},
+  {rank:8,  name:"Mei Ling",   av:"👧",   steps:43900, isYou:false, delta:1},
+  {rank:9,  name:"Ravi S.",    av:"👨‍🦱", steps:38400, isYou:false, delta:0},
+  {rank:10, name:"Marcus T.",  av:"🧔",   steps:29100, isYou:false, delta:-1},
+];
+
+export const LEADERBOARD_ACTIVITY = [
+  {rank:1,  name:"Aisha N.",   av:"🧕",   score:1240, bk:8, rent:4, sess:12, isYou:false, delta:1},
+  {rank:2,  name:"Sarah Lim",  av:"👩",   score:1180, bk:7, rent:6, sess:10, isYou:false, delta:-1},
+  {rank:3,  name:"Alex Tan",   av:"🏃",   score:980,  bk:6, rent:2, sess:9,  isYou:true,  delta:2},
+  {rank:4,  name:"Wei Ming",   av:"👨",   score:920,  bk:5, rent:5, sess:8,  isYou:false, delta:-1},
+  {rank:5,  name:"Jun Hao",    av:"🧑",   score:860,  bk:6, rent:1, sess:8,  isYou:false, delta:1},
+  {rank:6,  name:"Marcus T.",  av:"🧔",   score:740,  bk:4, rent:3, sess:7,  isYou:false, delta:0},
+  {rank:7,  name:"David Chen", av:"👨‍🦲", score:680,  bk:3, rent:4, sess:6,  isYou:false, delta:1},
+  {rank:8,  name:"Mei Ling",   av:"👧",   score:590,  bk:4, rent:0, sess:6,  isYou:false, delta:-2},
+  {rank:9,  name:"Priya K.",   av:"👩‍🦰", score:510,  bk:2, rent:2, sess:5,  isYou:false, delta:0},
+  {rank:10, name:"Ravi S.",    av:"👨‍🦱", score:430,  bk:3, rent:0, sess:4,  isYou:false, delta:-1},
+];
