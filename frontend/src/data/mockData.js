@@ -65,6 +65,25 @@ export const WORK = [
 ];
 export const WKCH = [{d:"M",m:90},{d:"T",m:0},{d:"W",m:60},{d:"T",m:45},{d:"F",m:0},{d:"S",m:120},{d:"S",m:75}];
 export const CATS = [{name:"Racket Sports",ic:"🏸",cl:"#00D68F",n:24},{name:"Team Sports",ic:"⚽",cl:"#A855F7",n:18},{name:"Water Sports",ic:"🏊",cl:"#00B4D8",n:12},{name:"Fitness",ic:"💪",cl:"#F43F5E",n:31}];
+// Popular times data: hourly busyness (0-100) per day, keyed by venue id
+const BASE_TIMES = {
+  indoor:  [0,0,0,0,0,0,10,25,40,50,55,65,70,60,45,40,55,75,85,70,50,30,15,5],
+  outdoor: [0,0,0,0,0,5,20,45,60,55,45,35,30,25,30,40,50,65,80,75,55,35,15,5],
+  pool:    [0,0,0,0,0,0,15,40,55,60,50,40,35,30,35,45,55,65,70,55,40,25,10,0],
+};
+const jitter = (arr,seed) => arr.map((v,i)=>{const j=((seed*7+i*13)%21)-10; return Math.max(0,Math.min(100,v+j));});
+const dayScale = [0.9,1.0,0.95,1.05,1.1,1.3,1.2]; // Mon-Sun multiplier
+
+export const POPULAR_TIMES = Object.fromEntries(VENUES.map(v=>{
+  const type = v.sport==="swimming"?"pool":["football","volleyball"].includes(v.sport)?"outdoor":"indoor";
+  const base = BASE_TIMES[type];
+  const days = ["MON","TUE","WED","THU","FRI","SAT","SUN"].map((label,di)=>({
+    label,
+    hours: jitter(base,v.id*10+di).map(h=>Math.round(Math.min(100,h*dayScale[di])))
+  }));
+  return [v.id, days];
+}));
+
 export const MW = 3200;
 export const MH = 1800;
 
