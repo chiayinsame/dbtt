@@ -135,3 +135,25 @@ export const IcPlay = ({s=20,c="currentColor"}) => <S w={s} c={c}>
   <circle cx="12" cy="12" r="10"/>
   <polygon points="10 8 16 12 10 16 10 8" fill={c} stroke="none"/>
 </S>;
+
+// Locker / lock icon for equipment rentals
+export const IcLocker = ({s=20,c="currentColor"}) => <S w={s} c={c}>
+  <rect x="5" y="11" width="14" height="10" rx="2"/>
+  <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+  <circle cx="12" cy="16" r="1" fill={c} stroke="none"/>
+</S>;
+
+// QR code icon for scanning
+export const IcQR = ({s=20,c="currentColor"}) => <S w={s} c={c}>
+  <rect x="3" y="3" width="7" height="7" rx="1"/>
+  <rect x="14" y="3" width="7" height="7" rx="1"/>
+  <rect x="3" y="14" width="7" height="7" rx="1"/>
+  <rect x="5" y="5" width="3" height="3" fill={c} stroke="none"/>
+  <rect x="16" y="5" width="3" height="3" fill={c} stroke="none"/>
+  <rect x="5" y="16" width="3" height="3" fill={c} stroke="none"/>
+  <line x1="14" y1="14" x2="14" y2="14"/>
+  <rect x="14" y="14" width="3" height="3" fill={c} stroke="none"/>
+  <rect x="18" y="18" width="3" height="3" fill={c} stroke="none"/>
+  <rect x="18" y="14" width="3" height="3" fill={c} stroke="none"/>
+  <rect x="14" y="18" width="3" height="3" fill={c} stroke="none"/>
+</S>;
