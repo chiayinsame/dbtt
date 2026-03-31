@@ -21,38 +21,45 @@ import { USER } from "./data/mockData";
 
 export default function App() {
   const { isDesktop } = useBreakpoint();
-  const [scr, setScr] = useState("map");
-  const [menu, setMenu] = useState(false);
-  const [selV, setSelV] = useState(null);
-  const [bookV, setBookV] = useState(null);
+  const [screen, setScreen] = useState("map");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [bookingVenue, setBookingVenue] = useState(null);
   const [credits, setCredits] = useState(USER.activeSGCredits);
-  const nav = id => { setSelV(null); setScr(id); };
+
+  const nav = id => { setSelectedVenue(null); setScreen(id); };
   const goHome = () => nav("map");
 
   const pages = (
     <>
-      {scr === "map"      && <MapPage onVenue={v => setSelV(v)} onMenu={() => setMenu(true)} />}
-      {scr === "search"   && <SearchPage onBack={goHome} />}
-      {scr === "profile"  && <ProfilePage onBack={goHome} credits={credits} onNav={nav} />}
-      {scr === "leaderboard" && <LeaderboardPage onBack={goHome} />}
-      {scr === "bookings" && <BookingsPage onBack={goHome} />}
-      {scr === "friends"  && <FriendsPage onBack={goHome} />}
-      {scr === "players"  && <FindPlayersPage onBack={goHome} />}
-      {scr === "classes"  && <ClassesPage onBack={goHome} />}
-      {scr === "lessons"  && <LessonsPage onBack={goHome} />}
-      {scr === "locker"   && <LockerPage onBack={goHome} credits={credits} setCredits={setCredits} />}
-      {scr === "map" && selV && <VenueSheet venue={selV} onClose={() => setSelV(null)} onBook={v => { setSelV(null); setBookV(v); }} />}
-      {menu && <MenuOverlay onClose={() => setMenu(false)} onNav={nav} />}
-      {bookV && <BookModal venue={bookV} onClose={() => setBookV(null)} />}
+      {screen === "map"         && <MapPage onVenue={v => setSelectedVenue(v)} onMenu={() => setMenuOpen(true)} />}
+      {screen === "search"      && <SearchPage onBack={goHome} />}
+      {screen === "profile"     && <ProfilePage onBack={goHome} credits={credits} onNav={nav} />}
+      {screen === "leaderboard" && <LeaderboardPage onBack={goHome} />}
+      {screen === "bookings"    && <BookingsPage onBack={goHome} />}
+      {screen === "friends"     && <FriendsPage onBack={goHome} />}
+      {screen === "players"     && <FindPlayersPage onBack={goHome} />}
+      {screen === "classes"     && <ClassesPage onBack={goHome} />}
+      {screen === "lessons"     && <LessonsPage onBack={goHome} />}
+      {screen === "locker"      && <LockerPage onBack={goHome} credits={credits} setCredits={setCredits} />}
+      {screen === "map" && selectedVenue && (
+        <VenueSheet
+          venue={selectedVenue}
+          onClose={() => setSelectedVenue(null)}
+          onBook={v => { setSelectedVenue(null); setBookingVenue(v); }}
+        />
+      )}
+      {menuOpen && <MenuOverlay onClose={() => setMenuOpen(false)} onNav={nav} />}
+      {bookingVenue && <BookModal venue={bookingVenue} onClose={() => setBookingVenue(null)} />}
     </>
   );
 
   if (isDesktop) {
     return (
-      <div style={{display:"flex",height:"100%",width:"100%",background:$.bg,fontFamily:$.font,color:$.t1,overflow:"hidden"}}>
+      <div style={{ display: "flex", height: "100%", width: "100%", background: $.bg, fontFamily: $.font, color: $.t1, overflow: "hidden" }}>
         <GlobalCSS />
-        <BottomNav active={scr} onNav={nav} credits={credits} />
-        <div style={{flex:1,position:"relative",overflow:"hidden"}}>
+        <BottomNav active={screen} onNav={nav} credits={credits} />
+        <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
           {pages}
         </div>
       </div>
@@ -60,11 +67,11 @@ export default function App() {
   }
 
   return (
-    <div style={{width:"100%",height:"100%",position:"relative",overflow:"hidden",fontFamily:$.font,color:$.t1,background:$.bg}}>
+    <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", fontFamily: $.font, color: $.t1, background: $.bg }}>
       <GlobalCSS />
       <StatusBar credits={credits} />
       {pages}
-      <BottomNav active={scr} onNav={nav} />
+      <BottomNav active={screen} onNav={nav} />
     </div>
   );
 }

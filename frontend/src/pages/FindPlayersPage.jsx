@@ -36,7 +36,7 @@ const btnOutline = {
   cursor: "pointer", fontFamily: $.font,
 };
 
-/* ── Stars ─────────────────────────────────────────────────────────────── */
+/* Stars */
 function Stars({ rating }) {
   const full = Math.floor(rating);
   const half = rating % 1 >= 0.5;
@@ -49,7 +49,7 @@ function Stars({ rating }) {
   );
 }
 
-/* ── Score bar ─────────────────────────────────────────────────────────── */
+/* ScoreBar */
 function ScoreBar({ score, height = 5 }) {
   const hi = score >= 70;
   const mid = score >= 45;
@@ -74,7 +74,7 @@ function scoreColor(score) {
   return score >= 70 ? $.ac : score >= 45 ? "#F59E0B" : $.t2;
 }
 
-/* ── Player mini-card (inside venue card) ──────────────────────────────── */
+/* PlayerRow — mini-card shown inside each venue card */
 function PlayerRow({ p }) {
   const initials = p.display_name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
@@ -116,7 +116,7 @@ function PlayerRow({ p }) {
   );
 }
 
-/* ── Venue recommendation card ─────────────────────────────────────────── */
+/* VenueCard — ranked venue recommendation with expandable player list */
 function VenueCard({ venue, sport, rank, isTop, onGo }) {
   const [expanded, setExpanded] = useState(false);
   const icon = SPORT_ICONS[sport] || "🏃";
@@ -257,7 +257,7 @@ function VenueCard({ venue, sport, rank, isTop, onGo }) {
   );
 }
 
-/* ── Demo user picker ──────────────────────────────────────────────────── */
+/* DemoUserPicker — lets users skip onboarding by picking an existing profile */
 function DemoUserPicker({ onPick, onBack }) {
   const [demoUsers, setDemoUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -317,10 +317,8 @@ function DemoUserPicker({ onPick, onBack }) {
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   MAIN PAGE
-   ══════════════════════════════════════════════════════════════════════════ */
-export default function FindPlayersPage({onBack}) {
+/* ── MAIN PAGE ───────────────────────────────────────────────────────────── */
+export default function FindPlayersPage({ onBack }) {
   // Steps: "form" | "demo" | "loading" | "results" | "confirmed"
   const [step, setStep] = useState("form");
   const [config, setConfig] = useState(null);
@@ -438,12 +436,11 @@ export default function FindPlayersPage({onBack}) {
     setStep("confirmed");
   };
 
-  /* ── DEMO PICKER ─────────────────────────────────────────────────────── */
   if (step === "demo") {
     return <DemoUserPicker onPick={handleDemoPick} onBack={() => setStep("form")} />;
   }
 
-  /* ── ONBOARDING FORM ─────────────────────────────────────────────────── */
+  /* Onboarding form */
   if (step === "form") {
     return (
       <Shell title="Find Game" onBack={onBack}>
@@ -575,7 +572,7 @@ export default function FindPlayersPage({onBack}) {
     );
   }
 
-  /* ── LOADING ─────────────────────────────────────────────────────────── */
+  /* Loading */
   if (step === "loading") {
     return (
       <Shell title="Find Game" onBack={onBack}>
@@ -590,7 +587,7 @@ export default function FindPlayersPage({onBack}) {
     );
   }
 
-  /* ── CONFIRMED ───────────────────────────────────────────────────────── */
+  /* Confirmed — user tapped "I'm heading there" */
   if (step === "confirmed" && confirmedVenue) {
     const bestCourt = confirmedVenue.court_details[0];
     return (
@@ -683,7 +680,7 @@ export default function FindPlayersPage({onBack}) {
     );
   }
 
-  /* ── RESULTS (venue-first recommendations) ──────────────────────────── */
+  /* Results — venue-first recommendations */
   const totalPlayers = venueResults.reduce((s, v) => s + v.players_looking, 0);
   const totalCourts = venueResults.reduce((s, v) => s + v.courts_available, 0);
 

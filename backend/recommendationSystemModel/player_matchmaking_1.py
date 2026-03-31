@@ -1,21 +1,11 @@
 """
-=============================================================================
-ActiveSG Player Matchmaking - ML Recommendation Model
-=============================================================================
-Smart Venue Booking for a More Active Population
+ActiveSG Player Matchmaking — ML Recommendation Model
 
-This program builds a machine learning model that recommends compatible
-players for on-site matchmaking at ActiveSG sporting venues. Given a user
-who needs extra players (e.g., a doubles partner for badminton), the model
-predicts match compatibility and returns ranked recommendations.
+Trains and evaluates a Random Forest and Neural Network for player
+compatibility prediction at ActiveSG venues. Outputs ranked recommendations
+and six diagnostic plots to outputs/.
 
-Components:
-1. Synthetic Data Generation - Realistic user profiles & match history
-2. Feature Engineering - Pairwise compatibility features
-3. Model Training - Neural Network + Random Forest (comparison)
-4. Evaluation - Accuracy, AUC-ROC, Precision/Recall
-5. Recommendation Demo - Top-N player recommendations with explanations
-=============================================================================
+Phases: data generation → feature engineering → training → evaluation → demo
 """
 
 import numpy as np
@@ -45,15 +35,13 @@ tf.random.set_seed(42)
 # Create output directory for plots
 os.makedirs('outputs', exist_ok=True)
 
-# =============================================================================
-# 1. SYNTHETIC DATA GENERATION
-# =============================================================================
+# ── 1. SYNTHETIC DATA GENERATION ─────────────────────────────────────────────
 
-print("=" * 70)
+print("=" * 60)
 print("PHASE 1: GENERATING SYNTHETIC USER & MATCH DATA")
-print("=" * 70)
+print("=" * 60)
 
-# --- Configuration ---
+# Configuration
 NUM_USERS = 500
 NUM_MATCHES = 5000
 
@@ -80,7 +68,6 @@ SKILL_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Competitive']
 
 PLAY_STYLES = ['Casual', 'Regular', 'Competitive']
 
-# Time availability slots (evening/weekend focus for working adults)
 TIME_SLOTS = [
     'Weekday Morning', 'Weekday Afternoon', 'Weekday Evening',
     'Weekend Morning', 'Weekend Afternoon', 'Weekend Evening'
@@ -90,61 +77,45 @@ AGE_GROUPS = ['13-19', '20-29', '30-39', '40-49', '50-59', '60+']
 
 
 def generate_users(n=NUM_USERS):
-    """Generate synthetic user profiles based on realistic Singapore demographics."""
+    """Generate n synthetic user profiles with realistic Singapore demographics."""
     users = []
-    
+
     for i in range(n):
-        # Age distribution weighted toward working adults (reflecting SG demographics)
-        age_group = np.random.choice(
-            AGE_GROUPS,
-            p=[0.12, 0.25, 0.22, 0.18, 0.13, 0.10]
-        )
-        
-        # Sport preference (badminton is most popular in SG)
-        primary_sport = np.random.choice(
-            SPORTS,
-            p=[0.30, 0.15, 0.10, 0.15, 0.08, 0.12, 0.10]
-        )
-        
-        # Secondary sport (some users play multiple sports)
+        age_group = np.random.choice(AGE_GROUPS, p=[0.12, 0.25, 0.22, 0.18, 0.13, 0.10])
+
+        # Badminton is most popular in Singapore
+        primary_sport = np.random.choice(SPORTS, p=[0.30, 0.15, 0.10, 0.15, 0.08, 0.12, 0.10])
+
         has_secondary = np.random.random() < 0.35
         secondary_sport = np.random.choice(
             [s for s in SPORTS if s != primary_sport]
         ) if has_secondary else None
-        
-        # Skill level (correlated with age somewhat)
-        if age_group in ['13-19']:
+
+        # Skill level correlated with age
+        if age_group == '13-19':
             skill = np.random.choice(SKILL_LEVELS, p=[0.30, 0.40, 0.20, 0.10])
         elif age_group in ['20-29', '30-39']:
             skill = np.random.choice(SKILL_LEVELS, p=[0.15, 0.35, 0.30, 0.20])
         else:
             skill = np.random.choice(SKILL_LEVELS, p=[0.20, 0.40, 0.30, 0.10])
-        
-        # Play style
+
         style = np.random.choice(PLAY_STYLES, p=[0.40, 0.35, 0.25])
-        
-        # Preferred venue (home venue, based on residential distribution)
+
         home_venue = np.random.choice(list(VENUES.keys()))
         home_lat, home_lon = VENUES[home_venue]
-        
-        # Availability - each user has 2-4 preferred time slots
+
+        # 2–4 time slots; working adults prefer evenings/weekends
         num_slots = np.random.randint(2, 5)
-        # Working adults prefer evenings/weekends
         if age_group in ['20-29', '30-39', '40-49']:
             slot_weights = [0.05, 0.05, 0.30, 0.20, 0.20, 0.20]
-        elif age_group in ['13-19']:
+        elif age_group == '13-19':
             slot_weights = [0.10, 0.20, 0.20, 0.15, 0.20, 0.15]
-        else:  # 50+, retired
+        else:  # 50+, retired — prefer mornings
             slot_weights = [0.25, 0.25, 0.10, 0.20, 0.15, 0.05]
-        
         slot_weights = np.array(slot_weights) / sum(slot_weights)
-        availability = list(np.random.choice(TIME_SLOTS, size=num_slots, 
-                                              replace=False, p=slot_weights))
-        
-        # Session count (how many times they've played via the platform)
+        availability = list(np.random.choice(TIME_SLOTS, size=num_slots, replace=False, p=slot_weights))
+
         sessions = max(1, int(np.random.exponential(15)))
-        
-        # Rating (1-5, based on sportsmanship/reliability)
         rating = round(np.clip(np.random.normal(3.8, 0.7), 1.0, 5.0), 1)
         
         users.append({
@@ -166,72 +137,40 @@ def generate_users(n=NUM_USERS):
 
 
 def calculate_compatibility(user_a, user_b):
-    """
-    Calculate ground-truth compatibility between two users.
-    Returns a probability of a successful match (0-1).
-    
-    Factors considered:
-    - Sport match (must share at least one sport)
-    - Skill gap (closer = better, but slight gap is okay)
-    - Distance between home venues
-    - Availability overlap
-    - Play style compatibility
-    - Age group compatibility
-    - User ratings
-    """
+    """Compute a ground-truth compatibility score (0–1) used to generate training labels."""
     score = 0.0
-    
-    # --- Sport Match (critical factor) ---
+
     sports_a = {user_a['primary_sport']}
     if user_a['secondary_sport']:
         sports_a.add(user_a['secondary_sport'])
     sports_b = {user_b['primary_sport']}
     if user_b['secondary_sport']:
         sports_b.add(user_b['secondary_sport'])
-    
-    sport_overlap = sports_a & sports_b
-    if not sport_overlap:
-        return 0.05  # Very unlikely to match if no sport in common
-    
-    # Primary sport match is stronger
-    if user_a['primary_sport'] == user_b['primary_sport']:
-        score += 0.25
-    else:
-        score += 0.10  # Secondary sport overlap
-    
-    # --- Skill Gap ---
+
+    if not (sports_a & sports_b):
+        return 0.05  # No sport in common — floor score
+
+    score += 0.25 if user_a['primary_sport'] == user_b['primary_sport'] else 0.10
+
+    # Skill gap
     skill_map = {'Beginner': 1, 'Intermediate': 2, 'Advanced': 3, 'Competitive': 4}
     skill_gap = abs(skill_map[user_a['skill_level']] - skill_map[user_b['skill_level']])
-    
-    if skill_gap == 0:
-        score += 0.20
-    elif skill_gap == 1:
-        score += 0.12  # Slight gap is still fine
-    elif skill_gap == 2:
-        score += 0.04
-    else:
-        score += 0.0  # Too big a gap
-    
-    # --- Distance ---
+    score += {0: 0.20, 1: 0.12, 2: 0.04}.get(skill_gap, 0.0)
+
+    # Distance (Euclidean × 111 ≈ km)
     dist = np.sqrt(
-        (user_a['latitude'] - user_b['latitude'])**2 + 
+        (user_a['latitude'] - user_b['latitude'])**2 +
         (user_a['longitude'] - user_b['longitude'])**2
-    ) * 111  # Rough km conversion
-    
-    if dist < 3:
-        score += 0.15
-    elif dist < 7:
-        score += 0.10
-    elif dist < 12:
-        score += 0.05
-    else:
-        score += 0.0
-    
-    # --- Availability Overlap ---
+    ) * 111
+    if dist < 3:   score += 0.15
+    elif dist < 7: score += 0.10
+    elif dist < 12: score += 0.05
+
+    # Availability overlap (capped at 3 slots)
     avail_overlap = len(set(user_a['availability']) & set(user_b['availability']))
     score += min(avail_overlap * 0.06, 0.18)
-    
-    # --- Play Style Compatibility ---
+
+    # Play style compatibility
     style_compat = {
         ('Casual', 'Casual'): 0.12,
         ('Casual', 'Regular'): 0.08,
@@ -242,53 +181,43 @@ def calculate_compatibility(user_a, user_b):
     }
     style_pair = tuple(sorted([user_a['play_style'], user_b['play_style']]))
     score += style_compat.get(style_pair, 0.05)
-    
-    # --- Age Group Compatibility ---
+
+    # Age compatibility
     age_map = {'13-19': 16, '20-29': 25, '30-39': 35, '40-49': 45, '50-59': 55, '60+': 65}
     age_gap = abs(age_map[user_a['age_group']] - age_map[user_b['age_group']])
     
-    if age_gap <= 10:
-        score += 0.08
-    elif age_gap <= 20:
-        score += 0.04
-    
-    # --- User Ratings ---
+    if age_gap <= 10:   score += 0.08
+    elif age_gap <= 20: score += 0.04
+
+    # Rating bonus (small)
     avg_rating = (user_a['user_rating'] + user_b['user_rating']) / 2
-    score += (avg_rating - 3.0) * 0.03  # Small bonus for high-rated users
-    
-    # Clamp and add noise
-    score = np.clip(score, 0, 1)
-    score += np.random.normal(0, 0.08)  # Add realistic noise
-    score = np.clip(score, 0, 1)
+    score += (avg_rating - 3.0) * 0.03
+
+    # Clip, add noise, clip again
+    score = np.clip(score + np.random.normal(0, 0.08), 0, 1)
     
     return score
 
 
 def generate_match_history(users_df, n_matches=NUM_MATCHES):
-    """Generate synthetic match history with compatibility outcomes."""
+    """Sample n_matches random user pairs and compute ground-truth compatibility."""
     matches = []
     user_list = users_df.to_dict('records')
     n_users = len(user_list)
-    
+
     for _ in range(n_matches):
-        # Pick two different users
         idx_a, idx_b = np.random.choice(n_users, size=2, replace=False)
         user_a = user_list[idx_a]
         user_b = user_list[idx_b]
-        
-        # Calculate compatibility score
+
         compat_score = calculate_compatibility(user_a, user_b)
-        
-        # Binary outcome: good match (1) or not (0)
-        # Threshold with some noise to create realistic distribution
         is_good_match = 1 if compat_score > 0.45 else 0
-        
+
         matches.append({
             'user_a_id': user_a['user_id'],
             'user_b_id': user_b['user_id'],
             'compatibility_score': round(compat_score, 3),
             'is_good_match': is_good_match,
-            # Store individual features for later use
             'a_sport': user_a['primary_sport'],
             'b_sport': user_b['primary_sport'],
             'a_secondary': user_a['secondary_sport'],
@@ -322,30 +251,26 @@ print(f"  Sport distribution:")
 for sport, count in users_df['primary_sport'].value_counts().items():
     print(f"    {sport}: {count} ({count/len(users_df)*100:.1f}%)")
 
-print(f"\nGenerating {NUM_MATCHES} match pair records...")
+print(f"\nGenerating {NUM_MATCHES} match pairs...")
 matches_df = generate_match_history(users_df)
 print(f"  Good matches: {matches_df['is_good_match'].sum()} ({matches_df['is_good_match'].mean()*100:.1f}%)")
 print(f"  Poor matches: {(1-matches_df['is_good_match']).sum()} ({(1-matches_df['is_good_match'].mean())*100:.1f}%)")
 
 
-# =============================================================================
-# 2. FEATURE ENGINEERING
-# =============================================================================
+# ── 2. FEATURE ENGINEERING ───────────────────────────────────────────────────
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("PHASE 2: FEATURE ENGINEERING")
-print("=" * 70)
+print("=" * 60)
 
 
 def engineer_features(df):
-    """Create pairwise compatibility features from match records."""
+    """Build the 18 pairwise compatibility features from a match records DataFrame."""
     features = pd.DataFrame()
-    
-    # --- Sport Match Features ---
-    # Primary sport match
+
+    # Sport features
     features['sport_match'] = (df['a_sport'] == df['b_sport']).astype(int)
-    
-    # Any sport overlap (including secondary)
+
     def any_sport_overlap(row):
         sports_a = {row['a_sport']}
         if row['a_secondary']:
@@ -356,49 +281,43 @@ def engineer_features(df):
         return int(bool(sports_a & sports_b))
     
     features['any_sport_overlap'] = df.apply(any_sport_overlap, axis=1)
-    
-    # --- Skill Level Features ---
+
+    # Skill features
     skill_map = {'Beginner': 1, 'Intermediate': 2, 'Advanced': 3, 'Competitive': 4}
-    features['skill_gap'] = abs(
-        df['a_skill'].map(skill_map) - df['b_skill'].map(skill_map)
-    )
-    features['avg_skill'] = (
-        df['a_skill'].map(skill_map) + df['b_skill'].map(skill_map)
-    ) / 2
+    features['skill_gap'] = abs(df['a_skill'].map(skill_map) - df['b_skill'].map(skill_map))
+    features['avg_skill'] = (df['a_skill'].map(skill_map) + df['b_skill'].map(skill_map)) / 2
     features['same_skill'] = (df['a_skill'] == df['b_skill']).astype(int)
-    
-    # --- Distance Feature ---
+
+    # Distance features (Euclidean × 111 ≈ km)
     features['distance_km'] = np.sqrt(
         (df['a_lat'] - df['b_lat'])**2 + (df['a_lon'] - df['b_lon'])**2
     ) * 111
     features['nearby'] = (features['distance_km'] < 5).astype(int)
-    
-    # --- Availability Overlap ---
+
+    # Availability features
     features['avail_overlap'] = df.apply(
         lambda r: len(set(r['a_availability']) & set(r['b_availability'])), axis=1
     )
     features['has_avail_overlap'] = (features['avail_overlap'] > 0).astype(int)
-    
-    # --- Play Style Features ---
+
+    # Play style features
     style_map = {'Casual': 1, 'Regular': 2, 'Competitive': 3}
-    features['style_gap'] = abs(
-        df['a_style'].map(style_map) - df['b_style'].map(style_map)
-    )
+    features['style_gap'] = abs(df['a_style'].map(style_map) - df['b_style'].map(style_map))
     features['same_style'] = (df['a_style'] == df['b_style']).astype(int)
-    
-    # --- Age Group Features ---
+
+    # Age features
     age_map = {'13-19': 16, '20-29': 25, '30-39': 35, '40-49': 45, '50-59': 55, '60+': 65}
-    features['age_gap'] = abs(
-        df['a_age'].map(age_map) - df['b_age'].map(age_map)
-    )
+    features['age_gap'] = abs(df['a_age'].map(age_map) - df['b_age'].map(age_map))
     features['same_age_group'] = (df['a_age'] == df['b_age']).astype(int)
-    
-    # --- Experience Features ---
+
+    # Experience features
     features['avg_sessions'] = (df['a_sessions'] + df['b_sessions']) / 2
-    features['session_ratio'] = df[['a_sessions', 'b_sessions']].min(axis=1) / \
-                                 df[['a_sessions', 'b_sessions']].max(axis=1)
-    
-    # --- Rating Features ---
+    features['session_ratio'] = (
+        df[['a_sessions', 'b_sessions']].min(axis=1) /
+        df[['a_sessions', 'b_sessions']].max(axis=1)
+    )
+
+    # Rating features
     features['avg_rating'] = (df['a_rating'] + df['b_rating']) / 2
     features['min_rating'] = df[['a_rating', 'b_rating']].min(axis=1)
     features['rating_gap'] = abs(df['a_rating'] - df['b_rating'])
@@ -419,20 +338,16 @@ print(f"\nFeature statistics:")
 print(feature_df.describe().round(3).to_string())
 
 
-# =============================================================================
-# 3. MODEL TRAINING
-# =============================================================================
+# ── 3. MODEL TRAINING ────────────────────────────────────────────────────────
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("PHASE 3: MODEL TRAINING")
-print("=" * 70)
+print("=" * 60)
 
-# Split data
 X_train, X_test, y_train, y_test = train_test_split(
     feature_df, target, test_size=0.2, random_state=42, stratify=target
 )
 
-# Scale features
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -440,9 +355,8 @@ X_test_scaled = scaler.transform(X_test)
 print(f"\nTraining set: {len(X_train)} samples")
 print(f"Test set:     {len(X_test)} samples")
 
-
-# --- Model 1: Random Forest (Baseline) ---
-print("\n--- Training Random Forest (Baseline) ---")
+# Random Forest
+print("\n--- Training Random Forest ---")
 rf_model = RandomForestClassifier(
     n_estimators=100,
     max_depth=10,
@@ -459,7 +373,7 @@ print(f"  Accuracy: {rf_acc:.4f}")
 print(f"  AUC-ROC:  {rf_auc:.4f}")
 
 
-# --- Model 2: Neural Network ---
+# Neural Network
 print("\n--- Training Neural Network ---")
 
 nn_model = keras.Sequential([
@@ -496,22 +410,18 @@ print(f"  Accuracy: {nn_acc:.4f}")
 print(f"  AUC-ROC:  {nn_auc:.4f}")
 
 
-# =============================================================================
-# 4. EVALUATION & VISUALISATION
-# =============================================================================
+# ── 4. EVALUATION & VISUALISATION ────────────────────────────────────────────
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("PHASE 4: MODEL EVALUATION")
-print("=" * 70)
+print("=" * 60)
 
-# --- Classification Reports ---
 print("\n--- Random Forest Classification Report ---")
 print(classification_report(y_test, rf_pred, target_names=['Poor Match', 'Good Match']))
 
 print("\n--- Neural Network Classification Report ---")
 print(classification_report(y_test, nn_pred, target_names=['Poor Match', 'Good Match']))
 
-# --- Model Comparison Summary ---
 print("\n" + "-" * 50)
 print("MODEL COMPARISON SUMMARY")
 print("-" * 50)
@@ -523,9 +433,7 @@ best_model_name = "Neural Network" if nn_auc > rf_auc else "Random Forest"
 print(f"\n>> Best model by AUC-ROC: {best_model_name}")
 
 
-# =============================================================================
-# PLOT 1: Training History (Neural Network)
-# =============================================================================
+# Plot 1: Neural Network Training History
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -553,9 +461,7 @@ plt.close()
 print("\nSaved: outputs/01_training_history.png")
 
 
-# =============================================================================
-# PLOT 2: ROC Curves Comparison
-# =============================================================================
+# Plot 2: ROC Curve Comparison
 
 fig, ax = plt.subplots(figsize=(8, 7))
 
@@ -584,9 +490,7 @@ plt.close()
 print("Saved: outputs/02_roc_comparison.png")
 
 
-# =============================================================================
-# PLOT 3: Confusion Matrices
-# =============================================================================
+# Plot 3: Confusion Matrices
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -607,9 +511,7 @@ plt.close()
 print("Saved: outputs/03_confusion_matrices.png")
 
 
-# =============================================================================
-# PLOT 4: Feature Importance (Random Forest)
-# =============================================================================
+# Plot 4: Feature Importance (Random Forest)
 
 importances = rf_model.feature_importances_
 feat_imp = pd.Series(importances, index=feature_df.columns).sort_values(ascending=True)
@@ -627,32 +529,26 @@ plt.close()
 print("Saved: outputs/04_feature_importance.png")
 
 
-# =============================================================================
-# PLOT 5: User Demographics Overview
-# =============================================================================
+# Plot 5: User Demographics Overview
 
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-# Sport distribution
 sport_counts = users_df['primary_sport'].value_counts()
 colors_sport = ['#1a7a6d', '#238b7e', '#2d9c8f', '#42b5a1', '#5dc9b3', '#8ddbc7', '#c8e64e']
 axes[0, 0].pie(sport_counts.values, labels=sport_counts.index, autopct='%1.1f%%',
                colors=colors_sport, startangle=90)
 axes[0, 0].set_title('Primary Sport Distribution', fontsize=12, fontweight='bold')
 
-# Skill level
 skill_counts = users_df['skill_level'].value_counts().reindex(SKILL_LEVELS)
 axes[0, 1].bar(skill_counts.index, skill_counts.values, color='#1a7a6d', edgecolor='white')
 axes[0, 1].set_title('Skill Level Distribution', fontsize=12, fontweight='bold')
 axes[0, 1].set_ylabel('Number of Users')
 
-# Age group
 age_counts = users_df['age_group'].value_counts().reindex(AGE_GROUPS)
 axes[1, 0].bar(age_counts.index, age_counts.values, color='#c8e64e', edgecolor='white')
 axes[1, 0].set_title('Age Group Distribution', fontsize=12, fontweight='bold')
 axes[1, 0].set_ylabel('Number of Users')
 
-# Play style
 style_counts = users_df['play_style'].value_counts()
 axes[1, 1].bar(style_counts.index, style_counts.values, color='#42b5a1', edgecolor='white')
 axes[1, 1].set_title('Play Style Distribution', fontsize=12, fontweight='bold')
@@ -665,9 +561,7 @@ plt.close()
 print("Saved: outputs/05_user_demographics.png")
 
 
-# =============================================================================
-# PLOT 6: Compatibility Score Distribution
-# =============================================================================
+# Plot 6: Compatibility Score Distribution
 
 fig, ax = plt.subplots(figsize=(10, 5))
 
@@ -689,15 +583,12 @@ plt.close()
 print("Saved: outputs/06_compatibility_distribution.png")
 
 
-# =============================================================================
-# 5. RECOMMENDATION DEMO
-# =============================================================================
+# ── 5. RECOMMENDATION DEMO ───────────────────────────────────────────────────
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("PHASE 5: RECOMMENDATION DEMO")
-print("=" * 70)
+print("=" * 60)
 
-# Use the better model for recommendations
 if nn_auc >= rf_auc:
     best_model = nn_model
     model_type = 'neural_network'
@@ -708,32 +599,18 @@ else:
     print(f"\nUsing Random Forest (AUC: {rf_auc:.3f}) for recommendations")
 
 
-def recommend_players(target_user_id, users_df, model, scaler, model_type, 
-                       sport_filter=None, top_n=5):
-    """
-    Given a target user, recommend the top-N most compatible players.
-    
-    Parameters:
-    -----------
-    target_user_id : str - The user seeking a match
-    sport_filter : str - Optional sport to filter by
-    top_n : int - Number of recommendations to return
-    
-    Returns:
-    --------
-    DataFrame with recommended players and compatibility details
-    """
+def recommend_players(target_user_id, users_df, model, scaler, model_type,
+                      sport_filter=None, top_n=5):
+    """Return the top-N most compatible players for the given user."""
     target = users_df[users_df['user_id'] == target_user_id].iloc[0]
     candidates = users_df[users_df['user_id'] != target_user_id].copy()
-    
-    # Optional: filter by sport
+
     if sport_filter:
         candidates = candidates[
             (candidates['primary_sport'] == sport_filter) |
             (candidates['secondary_sport'] == sport_filter)
         ]
-    
-    # Build pairwise feature vectors for all candidates
+
     pairs = []
     for _, cand in candidates.iterrows():
         pair = {
@@ -763,17 +640,14 @@ def recommend_players(target_user_id, users_df, model, scaler, model_type,
     pairs_df = pd.DataFrame(pairs)
     pair_features = engineer_features(pairs_df)
     pair_scaled = scaler.transform(pair_features)
-    
-    # Predict compatibility
+
     if model_type == 'neural_network':
         scores = model.predict(pair_scaled, verbose=0).flatten()
     else:
         scores = model.predict_proba(pair_scaled)[:, 1]
-    
+
     candidates = candidates.copy()
     candidates['match_score'] = scores
-    
-    # Sort and get top N
     top = candidates.nlargest(top_n, 'match_score')
     
     return top, target
@@ -838,9 +712,9 @@ def display_recommendations(target_user_id, users_df, model, scaler, model_type,
 
 # --- Run Demo Scenarios ---
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("SCENARIO 1: Casual badminton player looking for a partner")
-print("=" * 70)
+print("=" * 60)
 # Find a casual badminton player
 casual_badminton = users_df[
     (users_df['primary_sport'] == 'Badminton') & 
@@ -849,9 +723,9 @@ casual_badminton = users_df[
 display_recommendations(casual_badminton['user_id'], users_df, best_model, 
                          scaler, model_type, sport_filter='Badminton')
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("SCENARIO 2: Competitive basketball player seeking teammates")
-print("=" * 70)
+print("=" * 60)
 comp_basketball = users_df[
     (users_df['primary_sport'] == 'Basketball') & 
     (users_df['skill_level'].isin(['Advanced', 'Competitive']))
@@ -859,21 +733,19 @@ comp_basketball = users_df[
 display_recommendations(comp_basketball['user_id'], users_df, best_model, 
                          scaler, model_type, sport_filter='Basketball')
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("SCENARIO 3: Elderly user looking for any sport partner")
-print("=" * 70)
+print("=" * 60)
 elderly_user = users_df[users_df['age_group'] == '60+'].iloc[0]
 display_recommendations(elderly_user['user_id'], users_df, best_model, 
                          scaler, model_type)
 
 
-# =============================================================================
-# FINAL SUMMARY
-# =============================================================================
+# ── FINAL SUMMARY ────────────────────────────────────────────────────────────
 
-print("\n" + "=" * 70)
+print("\n" + "=" * 60)
 print("SUMMARY: PLAYER MATCHMAKING MODEL")
-print("=" * 70)
+print("=" * 60)
 
 print(f"""
 Dataset:

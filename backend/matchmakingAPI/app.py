@@ -1,21 +1,28 @@
 """
-app.py
-======
 Flask API server for the ActiveSG Player Matchmaking system.
 
-Endpoints:
-  GET  /api/venues                         - list all venues
-  GET  /api/users                          - list all users (with filters)
-  GET  /api/users/<user_id>                - get single user profile
-  POST /api/users                          - onboard a new user (register)
-  GET  /api/recommend/<user_id>            - get top-N recommendations
-  GET  /api/find-game/<user_id>            - venue-first matchmaking
-  GET  /api/venue/<venue_name>/active      - who's active at a specific venue
+Matchmaking endpoints:
+  GET  /api/config                   - form dropdown options
+  GET  /api/venues                   - all venues with active user counts
+  GET  /api/users                    - list users (filters: active, looking, sport, venue)
+  GET  /api/users/<user_id>          - full user profile
+  POST /api/users                    - register a new user
+  GET  /api/recommend/<user_id>      - top-N player recommendations
+  GET  /api/find-game/<user_id>      - venue-first matchmaking
+  GET  /api/venue/<name>/active      - active users at a specific venue
+
+Equipment rental endpoints:
+  GET  /api/lockers                  - list lockers (filters: venue, available)
+  GET  /api/lockers/<locker_id>      - single locker details
+  POST /api/rent                     - rent equipment (deducts credits)
+  POST /api/return                   - return equipment
+  GET  /api/rentals/<user_id>        - rental history (filter: status)
+  GET  /api/credits/<user_id>        - credit balance
+  POST /api/credits/<user_id>/topup  - add credits (demo use)
 
 Usage:
-  1. Run `python seed_database.py` first (once)
-  2. Run `python app.py`
-  3. Server starts at http://localhost:5000
+  1. Run `python seed_database.py` once to generate data and train the model.
+  2. Run `python app.py` — server starts at http://localhost:5000.
 """
 
 from flask import Flask, request, jsonify
@@ -25,6 +32,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import os
+import random
 from datetime import datetime, timedelta
 import uuid
 
@@ -429,8 +437,6 @@ def find_game(user_id):
     Query params:
       ?sport=Badminton   - filter by sport (defaults to user's primary sport)
     """
-    import random
-
     target = next((u for u in users if u['user_id'] == user_id), None)
     if not target:
         return jsonify({'error': 'User not found'}), 404

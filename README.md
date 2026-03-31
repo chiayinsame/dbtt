@@ -322,7 +322,7 @@ dbtt/
 │   ├── index.html
 │   └── src/
 │       ├── main.jsx                   # React entry point
-│       ├── App.jsx                    # Router (7 pages)
+│       ├── App.jsx                    # Router (10 screens)
 │       ├── theme/
 │       │   ├── tokens.js             # Design tokens (colors, spacing, fonts)
 │       │   └── GlobalStyles.jsx      # CSS animations & reset
@@ -348,6 +348,11 @@ dbtt/
 │       │   │   ├── PlayerAvatar.jsx  # Draggable player marker
 │       │   │   ├── VenueMarker.jsx   # Venue icon (zoomed out)
 │       │   │   └── VenueTower.jsx    # 3D venue tower (zoomed in)
+│       │   ├── locker/
+│       │   │   ├── QRScanner.jsx     # QR code scanner for locker unlock
+│       │   │   └── RentalModal.jsx   # Rental confirmation & duration picker
+│       │   ├── classes/
+│       │   │   └── ClassSignUpSheet.jsx  # Class sign-up bottom sheet
 │       │   └── venue/
 │       │       ├── VenueSheet.jsx    # Venue detail bottom sheet
 │       │       └── BookingModal.jsx  # Booking confirmation modal
@@ -358,7 +363,11 @@ dbtt/
 │           ├── ProfilePage.jsx       # User profile & stats
 │           ├── WorkoutsPage.jsx      # Workout history & weekly chart
 │           ├── BookingsPage.jsx      # Booking management
-│           └── FriendsPage.jsx       # Friends & nearby players
+│           ├── FriendsPage.jsx       # Friends & nearby players
+│           ├── LeaderboardPage.jsx   # Activity leaderboard
+│           ├── ClassesPage.jsx       # Browse & sign up for classes
+│           ├── LessonsPage.jsx       # Lesson listings
+│           └── LockerPage.jsx        # Equipment rental (QR + locker UI)
 └── .gitignore
 ```
 
@@ -369,7 +378,7 @@ dbtt/
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Interactive venue map | ✅ Done | 3200x1800 map with zoom, pan, 3D venue towers, Singapore MRT/roads |
-| Player matchmaking API | ✅ Done | 8 endpoints, 18-feature Random Forest model, human-readable explanations |
+| Player matchmaking API | ✅ Done | 15 endpoints, 18-feature Random Forest model, human-readable explanations |
 | ML analysis script | ✅ Done | RF + Neural Network comparison with visualizations |
 | Synthetic data generation | ✅ Done | 80 users, 12 real ActiveSG venues, automated model training |
 | Find Players UI | ✅ Done | Onboarding form, recommendation cards, score bars, match reasons |
@@ -379,10 +388,10 @@ dbtt/
 | Workouts page | ✅ Done | Weekly chart, activity history with calories |
 | Friends page | ✅ Done | Online status, "looking for players" section |
 | Responsive design | ✅ Done | Mobile (bottom nav) + desktop (sidebar) layouts |
+| IoT Smart Locker rental | ✅ Done | 7 API endpoints: rent, return, lockers, rentals, credits; JSON-backed |
 | Frontend-backend integration | 🔧 In Progress | FindPlayersPage wired to API; other pages use mock data |
 | Real-time occupancy (CV/OCR) | 🔧 In Progress | Jasper's model — to be integrated |
 | Demand forecasting | 🔧 In Progress | Chia Yin's model — to be integrated |
-| IoT Smart Locker rental | ✅ Done | 7 API endpoints: rent, return, lockers, rentals, credits (deduct/topup); JSON-backed |
 | User authentication | 📋 Planned | No auth layer yet |
 | Persistent database | 📋 Planned | Currently JSON file-based |
 | Push notifications | 📋 Planned | — |
