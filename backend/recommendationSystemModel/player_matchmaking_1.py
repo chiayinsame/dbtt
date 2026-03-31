@@ -2,7 +2,6 @@
 =============================================================================
 ActiveSG Player Matchmaking - ML Recommendation Model
 =============================================================================
-IS215 Digital Business Project - Group 4
 Smart Venue Booking for a More Active Population
 
 This program builds a machine learning model that recommends compatible
@@ -915,4 +914,4 @@ matches_df.to_csv('outputs/match_history.csv', index=False)
 print("Saved: outputs/user_profiles.csv")
 print("Saved: outputs/match_history.csv")
 
-print("\n✅ Player Matchmaking Model complete.")
+print("\n Player Matchmaking Model complete.")
